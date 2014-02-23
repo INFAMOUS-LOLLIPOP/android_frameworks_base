@@ -30,5 +30,22 @@
     <string name="animation_grow_shrink_left">Grow in (Left)</string>
     <string name="animation_grow_shrink_right">Grow in (Right)</string>
     <string name="action_null">Blank</string>
+<<<<<<< HEAD:core/res/res/values/infamous_strings.xml
     
 </resources>
+=======
+
+    <!-- Advanced settings -->
+    <string name="advanced_settings_title">Advanced</string>
+
+    <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+    <string name="permlab_recordScreen">Record content being displayed</string>
+
+    <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+    <string name="permdesc_recordScreen">Allows the app to record the users screen</string>
+
+    <!-- label for screen record item in phone options dialog -->
+    <string name="global_action_screen_record">Screen record</string>
+
+</resources>
+>>>>>>> ea6bf49... Base:screen recorder [1/2] (WIP):core/res/res/values/cr_strings.xml
