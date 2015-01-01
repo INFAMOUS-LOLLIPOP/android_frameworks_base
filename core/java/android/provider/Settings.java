@@ -3144,6 +3144,7 @@ public final class Settings {
          */
         public static final String STATUS_BAR_CLOCK = "status_bar_clock";
 
+<<<<<<< HEAD
          /**
          * Network traffic inactivity threshold (default is 10 kBs)
          * @hide
@@ -3182,6 +3183,8 @@ public final class Settings {
          */
         public static final String STATUSBAR_BATTERY_BAR_ANIMATE = "statusbar_battery_bar_animate";        
 
+=======
+>>>>>>> 96be17d... Statusbar clock+initial interface+colorpicker 2/2
         /**
          * AM/PM Style for clock options
          * 0 - Normal AM/PM
