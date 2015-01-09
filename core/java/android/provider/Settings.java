@@ -3051,6 +3051,18 @@ public final class Settings {
          */
         public static final String STATUS_BAR_CLOCK = "status_bar_clock";
 
+         /**
+         * Network traffic inactivity threshold (default is 10 kBs)
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
+
+        /**
+         * Whether or not to hide the network traffic indicator when there is no activity
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_AUTOHIDE = "network_traffic_autohide";
+
         /**
          * AM/PM Style for clock options
          * 0 - Normal AM/PM
@@ -3080,7 +3092,7 @@ public final class Settings {
          * @hide
          */          
         public static final String STATUSBAR_CLOCK_FONT_STYLE = "statusbar_clock_font_style";
-         
+
         /**
          * Shows custom date before clock time
          * 0 - No Date
@@ -3275,6 +3287,22 @@ public final class Settings {
          */
         public static final String VOICE_LAUNCH_INTENT = "voice_launch_intent";
 
+        /**
+         * Network traffic indicator, goes from least to greatest significant bitwise
+         * 0 = Display up-stream traffic if set
+         * 1 = Display down-stream traffic if set
+         * 2 = Show as Byte/s if set
+         * 16-31 = Refresh interval(ms) min: 250 max: 32750 default: 1000
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_STATE = "network_traffic_state";
+        
+       /**
+        * Network stats Color style
+        * @hide
+        */
+       public static final String NETWORK_TRAFFIC_COLOR = "network_traffic_color";
+       
         /**
          * Whether navigation bar is placed on the left side in landscape mode
          * @hide
