@@ -3740,6 +3740,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mRecreating = false;
             }
         });
+        // restart the keyguard so it picks up the newly created ScrimController
+        startKeyguard();
     }
 
     private void removeAllViews(ViewGroup parent) {
