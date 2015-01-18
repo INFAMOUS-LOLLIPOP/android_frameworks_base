@@ -291,6 +291,9 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
 
     public void setActivityStarter(ActivityStarter activityStarter) {
         mActivityStarter = activityStarter;
+        if (mMultiUserSwitch != null) {
+            mMultiUserSwitch.setActivityStarter(activityStarter);
+        }
     }
 
     public void setBatteryController(BatteryController batteryController) {
@@ -856,7 +859,9 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
             final boolean showingDetail = detail != null;
             transition(mClock, !showingDetail);
             transition(mDateGroup, !showingDetail);
-            transition(mWeatherContainer, !showingDetail);
+            if (mShowWeather) {
+                transition(mWeatherContainer, !showingDetail);
+            }
             if (mAlarmShowing) {
                 transition(mAlarmStatus, !showingDetail);
             }
