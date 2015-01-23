@@ -36,7 +36,6 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.provider.Settings;
 import android.telecom.TelecomManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -273,11 +272,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 mLockPatternUtils.getCurrentUser());
         boolean visible = !isCameraDisabledByDpm() && resolved != null
                 && getResources().getBoolean(R.bool.config_keyguardShowCameraAffordance);
-
-        boolean hideCamera = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.CAMERA_WIDGET_HIDE, 0, UserHandle.USER_CURRENT) == 1;
-
-        mCameraImageView.setVisibility((visible && !hideCamera) ? View.VISIBLE : View.GONE);
         visible = visible || mShortcutHelper.isTargetCustom(
                 LockscreenShortcutsHelper.Shortcuts.RIGHT_SHORTCUT);
         mCameraImageView.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -285,11 +279,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
     private void updatePhoneVisibility() {
         boolean visible = isPhoneVisible();
-
-        boolean hidePhone = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.DIALER_WIDGET_HIDE, 0, UserHandle.USER_CURRENT) == 1;
-
-        mPhoneImageView.setVisibility((visible && !hidePhone) ? View.VISIBLE : View.GONE);
         visible = visible || mShortcutHelper.isTargetCustom(
                 LockscreenShortcutsHelper.Shortcuts.LEFT_SHORTCUT);
         mPhoneImageView.setVisibility(visible ? View.VISIBLE : View.GONE);

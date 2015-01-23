@@ -3342,22 +3342,6 @@ public final class Settings {
         public static final String INCREASING_RING_RAMP_UP_TIME = "increasing_ring_ramp_up_time";
 
         /**
-         * Allows to disable Camera widget in locskcreen
-         * 0 = use system default (show)
-         * 1 = hide camera
-         * @hide
-         */
-        public static final String CAMERA_WIDGET_HIDE = "camera_widget_hide";
-
-       /**
-         * Allows to disable Dialer widget in locskcreen
-         * 0 = use system default (show)
-         * 1 = hide Dialer
-         * @hide
-         */
-        public static final String DIALER_WIDGET_HIDE = "dialer_widget_hide";
-
-        /**
          * I am the lolrus.
          * <p>
          * Nonzero values indicate that the user has a bukkit.
