@@ -163,7 +163,6 @@ import com.android.systemui.statusbar.policy.BluetoothControllerImpl;
 import com.android.systemui.statusbar.policy.BrightnessMirrorController;
 import com.android.systemui.statusbar.policy.CastControllerImpl;
 import com.android.systemui.statusbar.policy.Clock;
-import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.HeadsUpNotificationView;
 import com.android.systemui.statusbar.policy.HotspotControllerImpl;
 import com.android.systemui.statusbar.policy.KeyButtonView;
@@ -425,20 +424,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.SCREEN_BRIGHTNESS_MODE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CLOCK), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_TICKER_ENABLED),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.HEADS_UP_NOTIFCATION_DECAY),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.HEADS_UP_SNOOZE_TIME),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.BATTERY_SAVER_MODE_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.ENABLE_NAVIGATION_RING), false, this);					
             update();
         }
 
@@ -466,6 +451,39 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0) == 1;
                 mNavigationBarView.setLeftInLandscape(navLeftInLandscape);
             }
+        }
+    }
+
+    void updateClockView() {
+        mClockView.setVisibility(View.GONE);
+
+        switch (mClockLocation) {
+            default:
+            case Clock.STYLE_HIDE_CLOCK:
+                mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
+                // Don't set visibility here...
+                break;
+            case Clock.STYLE_CLOCK_RIGHT:
+                mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
+                mClockView.setVisibility(View.VISIBLE);
+                break;
+            case Clock.STYLE_CLOCK_CENTER:
+                mClockView = (TextView) mStatusBarView.findViewById(R.id.center_clock);
+                mClockView.setVisibility(View.VISIBLE);
+                break;
+            case Clock.STYLE_CLOCK_LEFT:
+                mClockView = (TextView) mStatusBarView.findViewById(R.id.left_clock);
+                mClockView.setVisibility(View.VISIBLE);
+                break;
+        }
+
+        setClockAndDateStatus();
+        mClockController.updateClockView(mClockView);
+    }
+
+    public void setClockAndDateStatus() {
+        if (mNotificationIcons != null) {
+            mNotificationIcons.setClockAndDateStatus(mClockLocation);
         }
     }
 
@@ -505,39 +523,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mNavigationBarView.setBar(this);
         mNavigationBarView.updateResources(getNavbarThemedResources());
         addNavigationBar();
-    }
-	
-    void updateClockView() {
-        mClockView.setVisibility(View.GONE);
-
-        switch (mClockLocation) {
-            default:
-            case Clock.STYLE_HIDE_CLOCK:
-                mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
-                // Don't set visibility here...
-                break;
-            case Clock.STYLE_CLOCK_RIGHT:
-                mClockView = (TextView) mStatusBarView.findViewById(R.id.clock);
-                mClockView.setVisibility(View.VISIBLE);
-                break;
-            case Clock.STYLE_CLOCK_CENTER:
-                mClockView = (TextView) mStatusBarView.findViewById(R.id.center_clock);
-                mClockView.setVisibility(View.VISIBLE);
-                break;
-            case Clock.STYLE_CLOCK_LEFT:
-                mClockView = (TextView) mStatusBarView.findViewById(R.id.left_clock);
-                mClockView.setVisibility(View.VISIBLE);
-                break;
-        }
-
-        setClockAndDateStatus();
-        mClockController.updateClockView(mClockView);
-    }
-
-    public void setClockAndDateStatus() {
-        if (mNotificationIcons != null) {
-            mNotificationIcons.setClockAndDateStatus(mClockLocation);
-        }
     }
 
     // ensure quick settings is disabled until the current user makes it through the setup wizard
@@ -1090,7 +1075,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 (SignalClusterView) mHeader.findViewById(R.id.signal_cluster);
             mNetworkController.addSignalCluster(signalCluster);
             mNetworkController.addSignalCluster(signalClusterKeyguard);
-            mNetworkController.addSignalhttps://github.com/CyanogenMod/android_frameworks_base.gitCluster(signalClusterQs);
+            mNetworkController.addSignalCluster(signalClusterQs);
             signalCluster.setSecurityController(mSecurityController);
             signalCluster.setNetworkController(mNetworkController);
             signalClusterKeyguard.setSecurityController(mSecurityController);
@@ -3255,7 +3240,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (!mTickerEnabled) return;
             if (mStatusBarContents.getVisibility() != View.VISIBLE) {
                 mStatusBarContents.setVisibility(View.VISIBLE);
-                mCenterClockLayout.setVisibility(View.VISIBLE);
                 mStatusBarContents
                         .startAnimation(loadAnim(com.android.internal.R.anim.fade_in, null));
                 mClockView.setVisibility(View.VISIBLE);
@@ -3817,7 +3801,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             FontSizeUtils.updateFontSize(clock, R.dimen.status_bar_clock_size);
         }
     }
-
     protected void loadDimens() {
         final Resources res = mContext.getResources();
 
