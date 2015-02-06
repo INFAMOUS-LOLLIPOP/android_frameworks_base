@@ -49,16 +49,18 @@ import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LocationTile;
 import com.android.systemui.qs.tiles.NfcTile;
 import com.android.systemui.qs.tiles.LockscreenToggleTile;
+import com.android.systemui.qs.tiles.LteTile;
 import com.android.systemui.qs.tiles.NotificationsTile;
 import com.android.systemui.qs.tiles.ProfilesTile;
 import com.android.systemui.qs.tiles.PerfProfileTile;
 import com.android.systemui.qs.tiles.RoamingTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
+import com.android.systemui.qs.tiles.VisualizerTile;
+import com.android.systemui.qs.tiles.ScreenTimeoutTile;
 import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.settings.CurrentUserTracker;
 import com.android.systemui.statusbar.policy.BluetoothController;
 import com.android.systemui.statusbar.policy.CastController;
-import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.KeyguardMonitor;
 import com.android.systemui.statusbar.policy.LocationController;
 import com.android.systemui.statusbar.policy.NetworkController;
@@ -97,7 +99,6 @@ public class QSTileHost implements QSTile.Host {
     private final Looper mLooper;
     private final CurrentUserTracker mUserTracker;
     private final VolumeComponent mVolume;
-    private final FlashlightController mFlashlight;
     private final UserSwitcherController mUserSwitcherController;
     private final KeyguardMonitor mKeyguard;
     private final SecurityController mSecurity;
@@ -108,8 +109,7 @@ public class QSTileHost implements QSTile.Host {
             BluetoothController bluetooth, LocationController location,
             RotationLockController rotation, NetworkController network,
             ZenModeController zen, VolumeComponent volume, HotspotController hotspot,
-            CastController cast, FlashlightController flashlight,
-            UserSwitcherController userSwitcher, KeyguardMonitor keyguard,
+            CastController cast, UserSwitcherController userSwitcher, KeyguardMonitor keyguard,
             SecurityController security) {
         mContext = context;
         mStatusBar = statusBar;
@@ -121,7 +121,6 @@ public class QSTileHost implements QSTile.Host {
         mVolume = volume;
         mHotspot = hotspot;
         mCast = cast;
-        mFlashlight = flashlight;
         mUserSwitcherController = userSwitcher;
         mKeyguard = keyguard;
         mSecurity = security;
@@ -227,11 +226,6 @@ public class QSTileHost implements QSTile.Host {
     }
 
     @Override
-    public FlashlightController getFlashlightController() {
-        return mFlashlight;
-    }
-
-    @Override
     public KeyguardMonitor getKeyguardMonitor() {
         return mKeyguard;
     }
@@ -318,6 +312,12 @@ public class QSTileHost implements QSTile.Host {
                 return new NfcTile(this);
             case QSConstants.TILE_LOCKSCREEN:
                 return new LockscreenToggleTile(this);
+            case QSConstants.TILE_LTE:
+                return new LteTile(this);
+            case QSConstants.TILE_VISUALIZER:
+                return new VisualizerTile(this);
+            case QSConstants.TILE_SCREEN_TIMEOUT:
+                return new ScreenTimeoutTile(this);
             default:
                 throw new IllegalArgumentException("Bad tile spec: " + tileSpec);
         }

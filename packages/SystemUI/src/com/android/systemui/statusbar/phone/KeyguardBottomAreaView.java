@@ -56,7 +56,6 @@ import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.KeyguardAffordanceView;
 import com.android.systemui.statusbar.KeyguardIndicationController;
 import com.android.systemui.statusbar.policy.AccessibilityController;
-import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 
 import java.util.List;
@@ -95,7 +94,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private ActivityStarter mActivityStarter;
     private UnlockMethodCache mUnlockMethodCache;
     private LockPatternUtils mLockPatternUtils;
-    private FlashlightController mFlashlightController;
     private PreviewInflater mPreviewInflater;
     private KeyguardIndicationController mIndicationController;
     private AccessibilityController mAccessibilityController;
@@ -245,10 +243,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         mActivityStarter = activityStarter;
     }
 
-    public void setFlashlightController(FlashlightController flashlightController) {
-        mFlashlightController = flashlightController;
-    }
-
     public void setAccessibilityController(AccessibilityController accessibilityController) {
         mAccessibilityController = accessibilityController;
         accessibilityController.addStateChangedCallback(this);
@@ -272,14 +266,28 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 mLockPatternUtils.getCurrentUser());
         boolean visible = !isCameraDisabledByDpm() && resolved != null
                 && getResources().getBoolean(R.bool.config_keyguardShowCameraAffordance);
-        visible = visible || mShortcutHelper.isTargetCustom(
+        visible = updateVisibilityCheck(visible,
                 LockscreenShortcutsHelper.Shortcuts.RIGHT_SHORTCUT);
         mCameraImageView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    private boolean updateVisibilityCheck(boolean visible, LockscreenShortcutsHelper.Shortcuts
+            shortcut) {
+        boolean customTarget = mShortcutHelper.isTargetCustom(shortcut);
+        if (customTarget) {
+            boolean isEmpty = mShortcutHelper.isTargetEmpty(shortcut);
+            if (visible && isEmpty) {
+                visible = false;
+            } else {
+                visible = true;
+            }
+        }
+        return visible;
+    }
+
     private void updatePhoneVisibility() {
         boolean visible = isPhoneVisible();
-        visible = visible || mShortcutHelper.isTargetCustom(
+        visible = updateVisibilityCheck(visible,
                 LockscreenShortcutsHelper.Shortcuts.LEFT_SHORTCUT);
         mPhoneImageView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
@@ -368,7 +376,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     }
 
     public void launchCamera() {
-        mFlashlightController.killFlashlight();
         Intent intent;
         if (!mShortcutHelper.isTargetCustom(LockscreenShortcutsHelper.Shortcuts.RIGHT_SHORTCUT)) {
             intent = getCameraIntent();
@@ -461,15 +468,16 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
     private String getIndexHint(LockscreenShortcutsHelper.Shortcuts shortcut) {
         if (mShortcutHelper.isTargetCustom(shortcut)) {
+            boolean isRtl = getLayoutDirection() == LAYOUT_DIRECTION_RTL;
             String label = mShortcutHelper.getFriendlyNameForUri(shortcut);
             int resId = 0;
             switch (shortcut) {
                 case LEFT_SHORTCUT:
-                        resId = R.string.left_shortcut_hint;
-                        break;
-                    case RIGHT_SHORTCUT:
-                        resId = R.string.right_shortcut_hint;
-                        break;
+                    resId = isRtl ? R.string.right_shortcut_hint : R.string.left_shortcut_hint;
+                    break;
+                case RIGHT_SHORTCUT:
+                    resId = isRtl ? R.string.left_shortcut_hint : R.string.right_shortcut_hint;
+                    break;
             }
             return mContext.getString(resId, label);
         } else {

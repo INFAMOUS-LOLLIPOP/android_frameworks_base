@@ -2331,6 +2331,26 @@ public class Intent implements Parcelable, Cloneable {
     public static final String ACTION_NEW_OUTGOING_CALL =
             "android.intent.action.NEW_OUTGOING_CALL";
 
+
+    /**
+     * Broadcast Action: An outgoing sms is about to be sent.
+     *
+     * The Intent will have the following extras:
+     * destAddr - the phone number originally intended to be dialled
+     * scAddr - the service center address
+     * multipart - indicate whether this is a multipart or single message
+     * parts - ArrayList<String> of text parts (one item if multipart=false)
+     * sentIntents - ArrayList<PendingIntent> to send on send
+     * deliveryIntents - ArrayList<PendingIntent> to send on delivery
+     *
+     * Once the broadcast is finished, resultData is used as the actual
+     * number to text.
+     *
+     * @hide
+     */
+    public static final String ACTION_NEW_OUTGOING_SMS =
+            "android.intent.action.NEW_OUTGOING_SMS";
+
     /**
      * Broadcast Action: Have the device reboot.  This is only for use by
      * system code.
@@ -2646,13 +2666,15 @@ public class Intent implements Parcelable, Cloneable {
      * Could indicate that curently applied theme is malicious.
      * @hide
      */
-    public static final String ACTION_APP_LAUNCH_FAILURE = "com.tmobile.intent.action.APP_LAUNCH_FAILURE";
+    public static final String ACTION_APP_FAILURE =
+            "com.tmobile.intent.action.APP_FAILURE";
 
     /**
      * Broadcast Action: Request to reset the unrecoverable errors count to 0.
      * @hide
      */
-    public static final String ACTION_APP_LAUNCH_FAILURE_RESET = "com.tmobile.intent.action.APP_LAUNCH_FAILURE_RESET";
+    public static final String ACTION_APP_FAILURE_RESET =
+            "com.tmobile.intent.action.APP_FAILURE_RESET";
 
     /**
      * Activity Action: Shows the brightness setting dialog.

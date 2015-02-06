@@ -649,6 +649,15 @@ public final class SystemServer {
                 }
             }
 
+            if (!disableNonCoreServices) {
+                try {
+                    Slog.i(TAG, "TorchService");
+                    ServiceManager.addService(Context.TORCH_SERVICE, new TorchService(context));
+                } catch (Throwable e) {
+                    reportWtf("starting Torch Service", e);
+                }
+            }
+
             if (!disableNetwork) {
                 try {
                     Slog.i(TAG, "NetworkManagement Service");
@@ -1152,14 +1161,14 @@ public final class SystemServer {
         }
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE);
-        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE_RESET);
+        filter.addAction(Intent.ACTION_APP_FAILURE);
+        filter.addAction(Intent.ACTION_APP_FAILURE_RESET);
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         filter.addAction(ThemeUtils.ACTION_THEME_CHANGED);
         filter.addCategory(Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE);
         filter.addDataScheme("package");
-        context.registerReceiver(new AppsLaunchFailureReceiver(), filter);
+        context.registerReceiver(new AppsFailureReceiver(), filter);
 
         // These are needed to propagate to the runnable below.
         final MountService mountServiceF = mountService;

@@ -650,11 +650,7 @@ public class ThemeService extends IThemeService.Stub {
     private boolean setCustomLockScreenWallpaper(String pkgName) {
         WallpaperManager wm = WallpaperManager.getInstance(mContext);
         try {
-            if (SYSTEM_DEFAULT.equals(pkgName)) {
-                final Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(),
-                        com.android.internal.R.drawable.default_wallpaper);
-                wm.setKeyguardBitmap(bmp);
-            } else if (TextUtils.isEmpty(pkgName)) {
+            if (SYSTEM_DEFAULT.equals(pkgName) || TextUtils.isEmpty(pkgName)) {
                 wm.clearKeyguardWallpaper();
             } else {
                 InputStream in = ImageUtils.getCroppedKeyguardStream(pkgName, mContext);
@@ -830,7 +826,7 @@ public class ThemeService extends IThemeService.Stub {
     private void postProgress() {
         int N = mClients.beginBroadcast();
         for(int i=0; i < N; i++) {
-            IThemeChangeListener listener = mClients.getBroadcastItem(0);
+            IThemeChangeListener listener = mClients.getBroadcastItem(i);
             try {
                 listener.onProgress(mProgress);
             } catch(RemoteException e) {
@@ -847,7 +843,7 @@ public class ThemeService extends IThemeService.Stub {
 
         int N = mClients.beginBroadcast();
         for(int i=0; i < N; i++) {
-            IThemeChangeListener listener = mClients.getBroadcastItem(0);
+            IThemeChangeListener listener = mClients.getBroadcastItem(i);
             try {
                 listener.onFinish(isSuccess);
             } catch(RemoteException e) {
@@ -865,7 +861,7 @@ public class ThemeService extends IThemeService.Stub {
     private void postFinishedProcessing(String pkgName) {
         int N = mProcessingListeners.beginBroadcast();
         for(int i=0; i < N; i++) {
-            IThemeProcessingListener listener = mProcessingListeners.getBroadcastItem(0);
+            IThemeProcessingListener listener = mProcessingListeners.getBroadcastItem(i);
             try {
                 listener.onFinishedProcessing(pkgName);
             } catch(RemoteException e) {
