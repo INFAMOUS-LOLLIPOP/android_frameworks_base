@@ -30,8 +30,6 @@
     <string name="animation_grow_shrink_left">Grow in (Left)</string>
     <string name="animation_grow_shrink_right">Grow in (Right)</string>
     <string name="action_null">Blank</string>
-    
-</resources>
 
     <!-- Advanced settings -->
     <string name="advanced_settings_title">Advanced</string>
@@ -44,5 +42,5 @@
 
     <!-- label for screen record item in phone options dialog -->
     <string name="global_action_screen_record">Screen record</string>
-
+    
 </resources>
