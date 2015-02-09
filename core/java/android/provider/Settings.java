@@ -3419,9 +3419,8 @@ public final class Settings {
          public static final String VOLUME_KEY_CURSOR_CONTROL = "volume_key_cursor_control";
 
         /**
-<<<<<<< HEAD
+
          * Whether to enable voice wakeup.  The value is boolean (1 or 0).
-=======
          * Override and forcefully disable the fullscreen keyboard
          * @hide
          */
@@ -3459,7 +3458,7 @@ public final class Settings {
 
         /**
          * Whether or not to hide the network traffic indicator when there is no activity
->>>>>>> ea6bf49... Base:screen recorder [1/2] (WIP)
+
          * @hide
          */
         public static final String VOICE_WAKEUP = "voice_wakeup";

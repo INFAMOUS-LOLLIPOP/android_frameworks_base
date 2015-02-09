@@ -171,12 +171,11 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         mShowSilentToggle = SHOW_SILENT_TOGGLE && !mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_useFixedVolume);
 
-<<<<<<< HEAD
         updatePowerMenuActions();
-=======
+
         mShowScreenRecord = mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_enableScreenrecordChord);
->>>>>>> ea6bf49... Base:screen recorder [1/2] (WIP)
+
     }
 
     /**
@@ -292,7 +291,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         mItems = new ArrayList<Action>();
 
-<<<<<<< HEAD
         String[] actionsArray;
         if (mActions == null) {
             actionsArray = mContext.getResources().getStringArray(
@@ -300,7 +298,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         } else {
             actionsArray = mActions.split("\\|");
         }
-=======
+
         // next: screen record, if enabled
         if (mShowScreenRecord) {
             if (Settings.System.getInt(mContext.getContentResolver(),
@@ -330,7 +328,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
         String[] defaultActions = mContext.getResources().getStringArray(
                 com.android.internal.R.array.config_globalActionsList);
->>>>>>> ea6bf49... Base:screen recorder [1/2] (WIP)
 
         ArraySet<String> addedKeys = new ArraySet<String>();
         for (int i = 0; i < actionsArray.length; i++) {
@@ -741,7 +738,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         }
     }
 
-<<<<<<< HEAD
+
     /**
      * functions needed for taking screenhots.
      * This leverages the built in ICS screenshot functionality
@@ -824,11 +821,11 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 mHandler.postDelayed(mScreenshotTimeout, 10000);
             }
         }
-=======
+
     private void toggleScreenRecord() {
         final Intent recordIntent = new Intent("org.chameleonos.action.NOTIFY_RECORD_SERVICE");
         mContext.sendBroadcast(recordIntent, Manifest.permission.RECORD_SCREEN);
->>>>>>> ea6bf49... Base:screen recorder [1/2] (WIP)
+
     }
 
     private void prepareDialog() {
