@@ -160,8 +160,6 @@
     <color name="user_icon_default_white">#ffffffff</color><!-- white -->
 
     <!-- TRDS colors -->
-<!-- commenting these out for now, until TRDS is implemented
     <color name="trds_background">#ffffffff</color>
     <color name="trds_text">#ff000000</color>
--->
 </resources>
