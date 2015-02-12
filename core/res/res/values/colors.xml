@@ -164,6 +164,4 @@
     <color name="trds_background">#ffffffff</color>
     <color name="trds_text">#ff000000</color>
 -->
-    <color name="trds_background">#ff000000</color>
-    <color name="trds_text">#ffffffff</color>
 </resources>
