@@ -138,7 +138,6 @@ public class Clock extends TextView implements DemoMode {
             mContext.getContentResolver().unregisterContentObserver(this);
         }
 
->>>>>>> cm/cm-12.0
         @Override
         public void update() {
             updateSettings();
