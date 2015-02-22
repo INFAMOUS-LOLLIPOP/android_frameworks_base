@@ -39,7 +39,6 @@ import android.widget.TextView;
 
 import com.android.systemui.DemoMode;
 import com.android.systemui.R;
-import com.android.systemui.cm.UserContentObserver;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -99,10 +98,7 @@ public class Clock extends TextView implements DemoMode {
             super(handler);
         }
 
-        @Override
-        protected void observe() {
-            super.observe();
-
+        void observe() {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System
                     .getUriFor(Settings.System.STATUS_BAR_CLOCK),
@@ -132,14 +128,7 @@ public class Clock extends TextView implements DemoMode {
         }
 
         @Override
-        protected void unobserve() {
-            super.unobserve();
-
-            mContext.getContentResolver().unregisterContentObserver(this);
-        }
-
-        @Override
-        public void update() {
+        public void onChange(boolean selfChange) {
             updateSettings();
         }
     }
