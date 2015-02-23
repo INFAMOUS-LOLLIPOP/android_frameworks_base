@@ -254,20 +254,21 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
             }
             findViewById(R.id.floating_action_button).setVisibility(View.VISIBLE);
             if (mRecentsView.hasSearchBar()) {
+
                 if (Settings.System.getInt(getContentResolver(),
-                    Settings.System.RECENTS_SHOW_HIDE_SEARCH_BAR, 1) != 1) {
+                    Settings.System.RECENTS_SHOW_HIDE_SEARCH_BAR, 1) == 0) {
                     mRecentsView.setSearchBarVisibility(View.VISIBLE);
                 } else {
                     mRecentsView.setSearchBarVisibility(View.GONE);
                    }
                 } else {
                 if (Settings.System.getInt(getContentResolver(),
-                    Settings.System.RECENTS_SHOW_HIDE_SEARCH_BAR, 1) != 1) {
+                    Settings.System.RECENTS_SHOW_HIDE_SEARCH_BAR, 1) == 0) {
                     addSearchBarAppWidgetView();
             } else {
-               }
-                }
-        }
+				}
+	    	 }
+		}	
 
 	// Update search bar space height
         Resources reso = getResources();
@@ -316,6 +317,8 @@ public class RecentsActivity extends Activity implements RecentsView.RecentsView
                     // Save the app widget id into the settings
                     mConfig.updateSearchBarAppWidgetId(this, widgetInfo.first);
                     mSearchAppWidgetInfo = widgetInfo.second;
+                } else {
+                    mConfig.updateSearchBarAppWidgetId(this, -1);
                 }
             }
         }
