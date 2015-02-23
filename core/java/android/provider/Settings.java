@@ -3594,6 +3594,12 @@ public final class Settings {
                 "task_open_behind",
         };  
         public static final String ANIMATION_CONTROLS_DURATION = "animation_controls_duration";
+        
+        /**
+         * Alternative recent apps integration using OmniSwitch
+         * @hide
+         */
+        public static final String RECENTS_USE_OMNISWITCH = "recents_use_omniswitch";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
