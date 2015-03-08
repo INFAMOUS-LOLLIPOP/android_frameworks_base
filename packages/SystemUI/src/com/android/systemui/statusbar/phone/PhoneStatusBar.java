@@ -53,6 +53,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.content.res.ThemeChangeRequest.RequestType;
 import android.content.res.ThemeConfig;
 import android.content.res.Resources;
 import android.database.ContentObserver;
@@ -136,6 +137,7 @@ import com.android.systemui.DemoMode;
 import com.android.systemui.EventLogTags;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
+import com.android.systemui.cm.UserContentObserver;
 import com.android.systemui.doze.DozeHost;
 import com.android.systemui.doze.DozeLog;
 import com.android.systemui.keyguard.KeyguardViewMediator;
@@ -165,6 +167,7 @@ import com.android.systemui.statusbar.policy.BatteryController.BatteryStateChang
 import com.android.systemui.statusbar.policy.BluetoothControllerImpl;
 import com.android.systemui.statusbar.policy.BrightnessMirrorController;
 import com.android.systemui.statusbar.policy.CastControllerImpl;
+import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.statusbar.policy.HeadsUpNotificationView;
 import com.android.systemui.statusbar.policy.HotspotControllerImpl;
 import com.android.systemui.statusbar.policy.KeyButtonView;
@@ -421,27 +424,38 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     // - The custom Recents Long Press, if selected.  When null, use default (switch last app).
     private ComponentName mCustomRecentsLongPressHandler = null;
 
-    class SettingsObserver extends ContentObserver {
+    class SettingsObserver extends UserContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
         }
 
-        void observe() {
+        @Override
+        protected void observe() {
+            super.observe();
+
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL), false, this);
+                    Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL), false, this,
+                    UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SCREEN_BRIGHTNESS_MODE), false, this);
+                    Settings.System.SCREEN_BRIGHTNESS_MODE), false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_CLOCK), false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_LEFT_IN_LANDSCAPE), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.RECENTS_LONG_PRESS_ACTIVITY), false, this);
             update();
         }
 
         @Override
-        public void onChange(boolean selfChange) {
-            update();
+        protected void unobserve() {
+            super.unobserve();
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.unregisterContentObserver(this);
         }
 
+        @Override
         public void update() {
             ContentResolver resolver = mContext.getContentResolver();
             int mode = Settings.System.getIntForUser(mContext.getContentResolver(),
@@ -449,12 +463,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                             Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL,
                             UserHandle.USER_CURRENT);
             mAutomaticBrightness = mode != Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL;
-            mBrightnessControl = Settings.System.getInt(
-                    resolver, Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0) == 1;
+            mBrightnessControl = Settings.System.getIntForUser(
+                    resolver, Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0,
+                    UserHandle.USER_CURRENT) == 1;
 
             if (mNavigationBarView != null) {
-                boolean navLeftInLandscape = Settings.System.getInt(resolver,
-                        Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0) == 1;
+                boolean navLeftInLandscape = Settings.System.getIntForUser(resolver,
+                        Settings.System.NAVBAR_LEFT_IN_LANDSCAPE, 0, UserHandle.USER_CURRENT) == 1;
                 mNavigationBarView.setLeftInLandscape(navLeftInLandscape);
             }
 
@@ -468,21 +483,29 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             super(handler);
         }
 
-        void observe() {
+        @Override
+        protected void observe() {
+            super.observe();
             ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.DEV_FORCE_SHOW_NAVBAR), false, this);
+            resolver.registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.DEV_FORCE_SHOW_NAVBAR), false, this, UserHandle.USER_ALL);
         }
 
         @Override
-        public void onChange(boolean selfChange) {
-            boolean visible = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
+        public void update() {
+            boolean visible = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                    Settings.Secure.DEV_FORCE_SHOW_NAVBAR, 0, UserHandle.USER_CURRENT) == 1;
+
             if (visible) {
                 forceAddNavigationBar();
             } else {
                 removeNavigationBar();
             }
+
+            // Send a broadcast to Settings to update Key disabling when user changes
+            Intent intent = new Intent("com.cyanogenmod.action.UserChanged");
+            intent.setPackage("com.android.settings");
+            mContext.sendBroadcastAsUser(intent, new UserHandle(UserHandle.USER_CURRENT));
         }
     }
 
@@ -794,7 +817,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 com.android.internal.R.integer.config_screenBrightnessDim);
 
         updateDisplaySize(); // populates mDisplayMetrics
-        updateResources();
+        updateResources(null);
 
         mIconSize = res.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_icon_size);
 
@@ -974,7 +997,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // Other icons
         mLocationController = new LocationControllerImpl(mContext); // will post a notification
-        mBatteryController = new BatteryController(mContext);
+        mBatteryController = new BatteryController(mContext, mHandler);
         mBatteryController.addStateChangedCallback(new BatteryStateChangeCallback() {
             @Override
             public void onPowerSaveChanged() {
@@ -985,6 +1008,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
             @Override
             public void onBatteryLevelChanged(int level, boolean pluggedIn, boolean charging) {
+                // noop
+            }
+            @Override
+            public void onBatteryStyleChanged(int style, int percentMode) {
                 // noop
             }
         });
@@ -1001,7 +1028,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mSuController = new SuControllerImpl(mContext);
 
         if (isMSim()) {
-            mMSimNetworkController = new MSimNetworkControllerImpl(mContext);
+            if (mMSimNetworkController == null) {
+                mMSimNetworkController = new MSimNetworkControllerImpl(mContext, mHandler);
+            }
             MSimSignalClusterView signalCluster = (MSimSignalClusterView)
                     mStatusBarView.findViewById(R.id.msim_signal_cluster);
             MSimSignalClusterView signalClusterKeyguard = (MSimSignalClusterView)
@@ -1039,7 +1068,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 //});
             }
         } else {
-            mNetworkController = new NetworkControllerImpl(mContext);
+            if (mNetworkController == null) {
+                mNetworkController = new NetworkControllerImpl(mContext);
+            }
             final SignalClusterView signalCluster =
                 (SignalClusterView)mStatusBarView.findViewById(R.id.signal_cluster);
             final SignalClusterView signalClusterKeyguard =
@@ -3594,7 +3625,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
         updateDisplaySize(); // populates mDisplayMetrics
 
-        updateResources();
+        updateResources(newConfig);
         updateClockSize();
         repositionNavigationBar();
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
@@ -3617,6 +3648,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     private void setControllerUsers() {
         if (mZenModeController != null) {
             mZenModeController.setUserId(mCurrentUserId);
+        }
+        if (mMSimNetworkController != null) {
+            mMSimNetworkController.setUserId(mCurrentUserId);
+        }
+        if (mBatteryController != null) {
+            mBatteryController.setUserId(mCurrentUserId);
         }
     }
 
@@ -3660,9 +3697,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mRecreating = true;
 
         if (mMSimNetworkController != null) {
-            mContext.unregisterReceiver(mMSimNetworkController);
+            mMSimNetworkController.removeAllSignalClusters();
         } else if (mNetworkController != null) {
-            mContext.unregisterReceiver(mNetworkController);
+            mNetworkController.removeAllSignalClusters();
         }
 
         removeHeadsUpView();
@@ -3766,14 +3803,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
      * should, but getting that smooth is tough.  Someday we'll fix that.  In the
      * meantime, just update the things that we know change.
      */
-    void updateResources() {
+    void updateResources(Configuration newConfig) {
         final Context context = mContext;
-        final Resources res = context.getResources();
 
         // detect theme change.
-        ThemeConfig newTheme = res.getConfiguration().themeConfig;
-        if (newTheme != null &&
-                (mCurrentTheme == null || !mCurrentTheme.equals(newTheme))) {
+        ThemeConfig newTheme = newConfig != null ? newConfig.themeConfig : null;
+        if (shouldUpdateStatusbar(mCurrentTheme, newTheme)) {
             mCurrentTheme = (ThemeConfig)newTheme.clone();
             recreateStatusBar();
         } else {
@@ -3805,6 +3840,25 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
     }
 
+    /**
+     * Determines if we need to recreate the status bar due to a theme change.  We currently
+     * check if the overlay for the status bar, fonts, or icons, or forced update count have
+     * changed.
+     *
+     * @param oldTheme
+     * @param newTheme
+     * @return True if we should recreate the status bar
+     */
+    private boolean shouldUpdateStatusbar(ThemeConfig oldTheme, ThemeConfig newTheme) {
+        return newTheme != null && (oldTheme == null || !newTheme.getOverlayForStatusBar()
+                .equals(oldTheme.getOverlayForStatusBar()) ||
+                !newTheme.getFontPkgName()
+                        .equals(oldTheme.getFontPkgName()) ||
+                !newTheme.getIconPackPkgName()
+                        .equals(oldTheme.getIconPackPkgName()) ||
+                newTheme.getLastThemeChangeRequestType() == RequestType.THEME_UPDATED);
+    }
+
     private void updateClockSize() {
         if (mStatusBarView == null) return;
         TextView clock = (TextView) mStatusBarView.findViewById(R.id.clock);
@@ -3812,7 +3866,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             FontSizeUtils.updateFontSize(clock, R.dimen.status_bar_clock_size);
         }
     }
-
     protected void loadDimens() {
         final Resources res = mContext.getResources();
 

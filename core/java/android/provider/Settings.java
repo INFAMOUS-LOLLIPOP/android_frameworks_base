@@ -3482,6 +3482,14 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_BATTERY_PERCENT = "status_bar_show_battery_percent";
 
         /**
+         * Visibility of SIM icons of unpopulated SIM slots in MSIM mode
+         * 0: Hide unpopulated SIM icons
+         * 1: Show unpopulated SIM icons
+         * @hide
+         */
+        public static final String STATUS_BAR_MSIM_SHOW_EMPTY_ICONS = "status_bar_show_empty_sims";
+
+        /**
          * Enable statusbar double tap gesture on to put device to sleep
          * @hide
          */
@@ -3617,6 +3625,54 @@ public final class Settings {
         public static final String RECENTS_USE_OMNISWITCH = "recents_use_omniswitch";
 
         /**
+         * Color temperature of the display during the day
+         * @hide
+         */
+        public static final String DISPLAY_TEMPERATURE_DAY = "display_temperature_day";
+
+        /**
+         * Color temperature of the display at night
+         * @hide
+         */
+        public static final String DISPLAY_TEMPERATURE_NIGHT = "display_temperature_night";
+
+        /**
+         * Display color temperature adjustment mode, one of DAY (default), NIGHT, or AUTO.
+         * @hide
+         */
+        public static final String DISPLAY_TEMPERATURE_MODE = "display_temperature_mode";
+
+        /**
+         * Automatic outdoor mode
+         * @hide
+         */
+        public static final String DISPLAY_AUTO_OUTDOOR_MODE = "display_auto_outdoor_mode";
+
+        /**
+         * Use display power saving features such as CABC or CABL
+         * @hide
+         */
+        public static final String DISPLAY_LOW_POWER = "display_low_power";
+
+        /**
+         * Use color enhancement feature of display
+         * @hide
+         */
+        public static final String DISPLAY_COLOR_ENHANCE = "display_color_enhance";
+
+        /**
+         * Manual display color adjustments (RGB values as floats, separated by spaces)
+         * @hide
+         */
+        public static final String DISPLAY_COLOR_ADJUSTMENT = "display_color_adjustment";
+
+        /**
+         * Did we tell about how they can stop breaking their eyes?
+         * @hide
+         */
+        public static final String LIVE_DISPLAY_HINTED = "live_display_hinted";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
@@ -3626,7 +3682,6 @@ public final class Settings {
          *
          * @hide
          */
-         
         public static final String[] SETTINGS_TO_BACKUP = {
             STAY_ON_WHILE_PLUGGED_IN,   // moved to global
             WIFI_USE_STATIC_IP,
@@ -3694,7 +3749,12 @@ public final class Settings {
             STATUS_BAR_SHOW_BATTERY_PERCENT,
             INCREASING_RING,
             INCREASING_RING_START_VOLUME,
-            INCREASING_RING_RAMP_UP_TIME
+            INCREASING_RING_RAMP_UP_TIME,
+            DISPLAY_TEMPERATURE_NIGHT,
+            DISPLAY_TEMPERATURE_DAY,
+            DISPLAY_TEMPERATURE_MODE,
+            DISPLAY_AUTO_OUTDOOR_MODE,
+            LIVE_DISPLAY_HINTED
         };
 
         /**
@@ -3954,6 +4014,12 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_MENU_ARROW_KEYS = "navigation_bar_menu_arrow_keys";
+
+        /**
+         * Whether or not to launch default music player when headset is connected
+         * @hide
+         */
+        public static final String HEADSET_CONNECT_PLAYER = "headset_connect_player";
 
     }
 
@@ -6114,6 +6180,14 @@ public final class Settings {
         public static final String BUTTON_BACKLIGHT_TIMEOUT = "button_backlight_timeout";
 
         /**
+         * Stored color matrix for LiveDisplay. This is used to allow co-existence with
+         * display tuning done by DisplayAdjustmentUtils when hardware support isn't
+         * available.
+         * @hide
+         */
+        public static final String LIVE_DISPLAY_COLOR_MATRIX = "live_display_color_matrix";
+
+        /**
          * This are the settings to be backed up.
          *
          * NOTE: Settings are backed up and restored in the order they appear
@@ -7859,6 +7933,12 @@ public final class Settings {
          * @hide
          */
         public static final String POLICY_CONTROL_STYLE = "policy_control_style";
+
+        /**
+         * @hide
+         */
+        public static final String ZEN_DISABLE_DUCKING_DURING_MEDIA_PLAYBACK =
+                "zen_disable_ducking_during_media_playback";
 
         /**
          * Defines global zen mode.  ZEN_MODE_OFF, ZEN_MODE_IMPORTANT_INTERRUPTIONS,
